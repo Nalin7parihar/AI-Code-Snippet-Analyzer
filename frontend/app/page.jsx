@@ -37,6 +37,37 @@ export default function Home() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [result, setResult] = useState(null);
+  const [previousSnippets, setPreviousSnippets] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+  const [historyLoading, setHistoryLoading] = useState(false);
+
+  // Function to fetch previous snippets
+  const fetchPreviousSnippets = async () => {
+    setHistoryLoading(true);
+    try {
+      const response = await fetch(
+        "http://localhost:5001/api/analyze/snippets",
+        {
+          method: "GET",
+          headers: {
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Failed to fetch previous snippets");
+      }
+
+      const data = await response.json();
+      setPreviousSnippets(data.data || []);
+    } catch (err) {
+      console.error("Error fetching snippets:", err);
+      setError(err.message || "Failed to load previous snippets");
+    } finally {
+      setHistoryLoading(false);
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -72,6 +103,9 @@ export default function Home() {
       const data = await response.json();
       const analysis = data.data.analysis;
       setResult(analysis);
+      
+      // Refresh snippets list after successful submission
+      fetchPreviousSnippets();
     } catch (err) {
       setError(err.message || "Something went wrong");
     } finally {
@@ -79,13 +113,87 @@ export default function Home() {
     }
   };
 
+  // Toggle history view and fetch snippets if needed
+  const toggleHistory = () => {
+    if (!showHistory && previousSnippets.length === 0) {
+      fetchPreviousSnippets();
+    }
+    setShowHistory(!showHistory);
+  };
+
+  // Function to load a snippet for analysis
+  const loadSnippet = (snippet) => {
+    setTitle(snippet.title);
+    setLanguage(snippet.language);
+    setCode(snippet.code);
+    setShowHistory(false);
+    setResult(snippet.analysis); // If the analysis is stored with the snippet
+  };
+
   return (
     <main className="container mx-auto py-10 px-4 md:px-6">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-4xl font-bold">CodeIntel</h1>
-        <ThemeToggle />
+        <div className="flex items-center gap-4">
+          <Button 
+            variant="outline" 
+            onClick={toggleHistory}
+            className="flex items-center gap-2"
+          >
+            {showHistory ? "Back to Editor" : "View History"}
+            {historyLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+          </Button>
+          <ThemeToggle />
+        </div>
       </div>
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      
+      {showHistory ? (
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Previous Code Snippets</CardTitle>
+              <CardDescription>
+                View and load your previously analyzed code snippets
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {previousSnippets.length > 0 ? (
+                <div className="space-y-4">
+                  {previousSnippets.map((snippet, index) => (
+                    <div 
+                      key={index} 
+                      className="p-4 border rounded-lg hover:border-blue-500 transition-colors cursor-pointer"
+                      onClick={() => loadSnippet(snippet)}
+                    >
+                      <div className="flex justify-between items-start mb-2">
+                        <h3 className="font-medium text-lg">{snippet.title}</h3>
+                        <span className="px-2 py-1 bg-gray-100 dark:bg-gray-800 rounded text-xs capitalize">
+                          {snippet.language}
+                        </span>
+                      </div>
+                      <div className="text-sm text-gray-500 mb-2">
+                        {new Date(snippet.createdAt).toLocaleString()}
+                      </div>
+                      <pre className="bg-gray-50 dark:bg-gray-900 p-3 rounded-md text-xs line-clamp-3 overflow-hidden">
+                        <code>{snippet.code}</code>
+                      </pre>
+                    </div>
+                  ))}
+                </div>
+              ) : historyLoading ? (
+                <div className="flex justify-center items-center h-64">
+                  <Loader2 className="h-8 w-8 animate-spin text-gray-400" />
+                </div>
+              ) : (
+                <div className="text-center py-12">
+                  <p className="text-gray-500">No previous snippets found</p>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <Card className="col-span-1">
           <CardHeader>
             <CardTitle>Code Input</CardTitle>
@@ -402,6 +510,7 @@ export default function Home() {
           </CardContent>
         </Card>
       </div>
+      )}
     </main>
   );
 }

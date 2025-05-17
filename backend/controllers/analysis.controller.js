@@ -28,4 +28,19 @@ const snippetAnalyzer = async (req,res) => {
   }
 }
 
-export default snippetAnalyzer;
+const getAllSnippets = async (req,res) => {
+  try {
+    const snippets = await analysisModel.find();
+    return res.status(200).json({
+      message : "Snippets fetched successfully",
+      data : snippets
+    })
+  } catch (error) {
+    return res.status(500).json({
+      message : "Internal server error",
+      error : error.message
+    })
+  }
+}
+
+export  {snippetAnalyzer,getAllSnippets};
