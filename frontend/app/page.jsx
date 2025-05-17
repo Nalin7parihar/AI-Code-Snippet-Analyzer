@@ -159,7 +159,7 @@ export default function Home() {
             <CardContent>
               {previousSnippets.length > 0 ? (
                 <div className="space-y-4">
-                  {previousSnippets.map((snippet, index) => (
+                  {[...previousSnippets].reverse().map((snippet, index) => (
                     <div 
                       key={index} 
                       className="p-4 border rounded-lg hover:border-blue-500 transition-colors cursor-pointer"
