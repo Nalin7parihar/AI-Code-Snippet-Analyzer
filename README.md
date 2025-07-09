@@ -24,7 +24,7 @@ A powerful web application that leverages **Artificial Intelligence** to analyze
 
 ### 🔧 Frontend
 - JavaScript – Core language for interactive UI  
-- CSS – For styling and responsive design  
+- Tailwind CSS – For styling and responsive design  
 - **Next.js** – For building the UI with server-side rendering support
 
 ### 🧠 Backend
