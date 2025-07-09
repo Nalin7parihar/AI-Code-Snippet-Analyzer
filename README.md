@@ -19,7 +19,7 @@ JavaScript: Core language for interactive UI.
 
 CSS: For styling and responsive design.
 
-React.js: For building the user interface.
+Next.js: For building the user interface and server-side rendering capabilities.
 
 Backend:
 
@@ -45,19 +45,13 @@ cd AI-Code-Snippet-Analyzer
 
 Install backend dependencies:
 
-# If your backend is in a separate folder (e.g., 'server' or 'backend')
-cd backend # or server
+cd backend
 npm install
-# cd .. # Go back to root if needed
 
 Install frontend dependencies:
 
-# If your frontend is in a separate folder (e.g., 'client' or 'frontend')
-cd frontend # or client
+cd frontend
 npm install
-# cd .. # Go back to root if needed
-
-If your project is a single directory, you might only need npm install in the root.
 
 Configure Environment Variables:
 Create a .env file in your backend directory (and/or frontend if needed) and add your API keys or other sensitive information.
@@ -71,6 +65,7 @@ Running the Application
 Start the backend server:
 
 # From your backend directory
+cd backend
 npm start # or node server.js, or npm run dev depending on your setup
 
 The backend typically runs on http://localhost:5000 (or another port specified in your code).
@@ -78,7 +73,8 @@ The backend typically runs on http://localhost:5000 (or another port specified i
 Start the frontend development server:
 
 # From your frontend directory
-npm start # or npm run dev, or yarn dev
+cd frontend
+npm run dev # or npm start, or yarn dev
 
 The frontend typically runs on http://localhost:3000 (or another port).
 
